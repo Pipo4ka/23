@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кнопка с анимацией и звуком</title>
+    <style>
+        /* Общие стили */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Arial', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* Темы */
+        :root {
+            --bg-color: #f0f0f0;
+            --text-color: #333;
+            --button-color: linear-gradient(45deg, #ff416c, #ff4b2b);
+            --button-hover: linear-gradient(45deg, #ff4b2b, #ff416c);
+            --button-glow: rgba(255, 75, 43, 0.7);
+        }
+        [data-theme="dark"] {
+            --bg-color: #1e1e1e;
+            --text-color: #ddd;
+            --button-color: linear-gradient(45deg, #6a11cb, #2575fc);
+            --button-hover: linear-gradient(45deg, #2575fc, #6a11cb);
+            --button-glow: rgba(37, 117, 252, 0.7);
+        }
+
+        /* Кнопка */
+        .button-container {
+            text-align: center;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            background: var(--button-color);
+            color: white;
+            text-transform: uppercase;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        button:hover {
+            background: var(--button-hover);
+            transform: scale(1.1);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        button::after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: var(--button-glow);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            filter: blur(15px);
+        }
+        button:hover::after {
+            opacity: 1;
+        }
+
+        /* Счётчик */
+        .counter {
+            font-size: 20px;
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .counter.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Тумблер темы */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+    <div class="button-container">
+        <button id="clickButton">Нажми меня</button>
+        <div class="counter" id="clickCounter">Нажатий: 0</div>
+    </div>
+
+    <!-- Звук (замени 'sound.mp3' на название своего файла) -->
+    <audio id="clickSound" src="yamete_kudasai.mp3"></audio>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const button = document.getElementById("clickButton");
+            const counter = document.getElementById("clickCounter");
+            const themeToggle = document.getElementById("themeToggle");
+            const clickSound = document.getElementById("clickSound"); 
+
+            let clickCount = localStorage.getItem("clickCount") || 0;
+            let isDarkMode = localStorage.getItem("theme") === "dark";
+
+            // Устанавливаем начальную тему
+            if (isDarkMode) {
+                document.body.setAttribute("data-theme", "dark");
+                themeToggle.textContent = "☀️";
+            }
+
+            // Обновляем счётчик
+            counter.textContent = `Нажатий: ${clickCount}`;
+            if (clickCount > 0) counter.classList.add("show");
+
+            button.addEventListener("click", () => {
+                clickCount++;
+                counter.textContent = `Нажатий: ${clickCount}`;
+                counter.classList.add("show");
+
+                // Воспроизводим локальный звук
+                clickSound.currentTime = 0;
+                clickSound.play();
+
+                // Сохраняем количество кликов
+                localStorage.setItem("clickCount", clickCount);
+            });
+
+            // Переключение темы
+            themeToggle.addEventListener("click", () => {
+                isDarkMode = !isDarkMode;
+                document.body.setAttribute("data-theme", isDarkMode ? "dark" : "light");
+                themeToggle.textContent = isDarkMode ? "☀️" : "🌙";
+
+                // Сохраняем тему
+                localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+            });
+        });
+    </script>
+</body>
+</html>
